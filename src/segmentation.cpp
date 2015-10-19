@@ -111,11 +111,91 @@ void segmentationSection(ImageWriter& iw)
         }
 
         for(std::vector<cv::Point>::const_iterator it = non_associated.begin(); it != non_associated.end(); ++it)
-        {
             cv::circle(canvas.image, *it, 5, cv::Scalar(255, 0, 0), 2);
-        }
 
         iw.process(canvas);
     }
 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    canvas = iw.nextCanvas();
+    drawWorld(canvas, wm);
+
+    for(std::vector<cv::Point>::const_iterator it = non_associated.begin(); it != non_associated.end(); ++it)
+        cv::circle(canvas.image, *it, 5, cv::Scalar(255, 0, 0), 2);
+
+    iw.process(canvas);
+
+    Model2D new_model;
+    Contour2D& new_contour = new_model.addContour();
+
+    for(unsigned int i = 0; i < non_associated.size(); ++i)
+    {
+        const cv::Point& p1_image = non_associated[i];
+        geo::Vec2 p1_world = canvas.imageToWorld(p1_image);
+
+        new_contour.addPoint(p1_world.x, p1_world.y);
+    }
+
+    wm.addEntity(new_model, geo::Transform2::identity());
+    drawWorld(canvas, wm);
+
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    canvas = iw.nextCanvas();
+    drawWorld(canvas, wm);
+    ranges_virtual = renderLRF(lrf, lrf_pose, wm);
+    ranges_real = renderLRF(lrf, lrf_pose, wm_real);
+    drawRanges(canvas, lrf, lrf_pose, ranges_virtual, Color(255, 0, 0, 3));
+    drawRanges(canvas, lrf, lrf_pose_real, ranges_real, Color(0, 150, 0, 3), Color(200, 200, 200));
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    lrf_pose = fromXYADegrees(3.5, 0, -135);
+    lrf_pose_real = lrf_pose;
+    lrf_pose_real.t.y += 0.03;
+
+    canvas = iw.nextCanvas();
+    drawWorld(canvas, wm);
+    ranges_virtual = renderLRF(lrf, lrf_pose, wm);
+    ranges_real = renderLRF(lrf, lrf_pose, wm_real);
+    drawRanges(canvas, lrf, lrf_pose, ranges_virtual, Color(255, 0, 0, 3));
+    drawRanges(canvas, lrf, lrf_pose_real, ranges_real, Color(0, 150, 0, 3), Color(200, 200, 200));
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    rangesToImagePoints(canvas, lrf, lrf_pose, ranges_virtual, points_virtual);
+    rangesToImagePoints(canvas, lrf, lrf_pose_real, ranges_real, points_real);
+
+    for(unsigned int i = 0; i < ranges_real.size(); ++i)
+    {
+        double rv = ranges_virtual[i];
+        double rr = ranges_real[i];
+
+        if (std::abs(rv - rr) > 0.1)
+            cv::circle(canvas.image, points_real[i], 5, cv::Scalar(255, 0, 0), 2);
+    }
+
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    wm.entities.pop_back();
+    wm.addEntity(createBox(0.8, 0.8), fromXYA(1.5, -1.5, 0), Color(0, 0, 0, 2));
+
+    canvas = iw.nextCanvas();
+    drawWorld(canvas, wm);
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    ranges_virtual = renderLRF(lrf, lrf_pose, wm);
+    ranges_real = renderLRF(lrf, lrf_pose, wm_real);
+    drawRanges(canvas, lrf, lrf_pose, ranges_virtual, Color(255, 0, 0, 3));
+    drawRanges(canvas, lrf, lrf_pose_real, ranges_real, Color(0, 150, 0, 3), Color(200, 200, 200));
+    iw.process(canvas);
 }

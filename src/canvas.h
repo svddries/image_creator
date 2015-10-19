@@ -46,6 +46,12 @@ struct Canvas
         return (p_image.x >= 0 && p_image.y >= 0 && p_image.x < image.cols && p_image.y < image.rows);
     }
 
+    geo::Vec2 imageToWorld(const cv::Point& p_image)
+    {
+        return geo::Vec2((p_image.x - center.x) / pixels_per_meter,
+                         (p_image.y - center.y) / pixels_per_meter);
+    }
+
     Canvas createSubCanvas(double x, double y, double width, double height)
     {
         int xp = x * image.cols;

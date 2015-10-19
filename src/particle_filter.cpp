@@ -79,6 +79,8 @@ void drawParticleFilter(Canvas& canvas, const geo::LaserRangeFinder& lrf, const 
 
 void particleFilterSection(ImageWriter& iw, const geo::LaserRangeFinder& lrf, const WorldModel2D& wm)
 {
+    iw.setLabel("pf");
+
     std::vector<geo::Transform2> particles;
     for(double y = -1; y < 1.5; y += 0.5)
         for(double x = -3; x < 3.5; x += 0.5)

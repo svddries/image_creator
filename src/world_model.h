@@ -49,6 +49,18 @@ struct WorldModel2D
         entities.push_back(Entity2D(m, t, color));
     }
 
+    WorldModel2D createTransformed(const geo::Transform2& t)
+    {
+        WorldModel2D wm_t = *this;
+        for(unsigned int i = 0; i < wm_t.entities.size(); ++i)
+        {
+            Entity2D& e = wm_t.entities[i];
+            e.pose = t * e.pose;
+        }
+
+        return wm_t;
+    }
+
 };
 
 // ----------------------------------------------------------------------------------------------------

@@ -3,12 +3,24 @@
 #include "particle_filter.h"
 #include "segmentation.h"
 #include "relative.h"
+#include "bad_localization.h"
 
 // ----------------------------------------------------------------------------------------------------
 
 int main(int argc, char **argv)
 {
     ImageWriter iw(800, 600, cv::Scalar(255, 255, 255));
+
+    bool show = true;
+
+    if (!show && argc > 1)
+    {
+        iw.setWritePath(argv[1]);
+        iw.setWrite(true);
+//        std::cout << "Going to write!" << std::endl;
+    }
+
+    iw.setShow(show);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -30,11 +42,11 @@ int main(int argc, char **argv)
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    segmentationSection(iw);
+//    segmentationSection(iw);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-//    wrongLocalization(iw);
+    badLocalization(iw);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

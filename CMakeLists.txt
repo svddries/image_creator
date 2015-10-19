@@ -63,6 +63,7 @@ add_library(image_creator
   src/canvas.cpp
   src/relative.cpp
   src/world_model.cpp
+  src/bad_localization.cpp
 )
 
 add_executable(create-images src/create_images.cpp)

@@ -54,7 +54,18 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
 )
 
+add_library(image_creator
+  src/particle_filter.cpp
+  src/lrf.cpp
+  src/image_writer.cpp
+  src/create_images.cpp
+  src/segmentation.cpp
+  src/canvas.cpp
+  src/relative.cpp
+  src/world_model.cpp
+)
+
 add_executable(create-images src/create_images.cpp)
-target_link_libraries(create-images ${catkin_LIBRARIES})
+target_link_libraries(create-images image_creator ${catkin_LIBRARIES})
 
 

@@ -93,6 +93,38 @@ void drawGraph(Canvas& graph_canvas)
 
 // ----------------------------------------------------------------------------------------------------
 
+std::vector<geo::Transform2> filterParticles(const geo::LaserRangeFinder& lrf, const std::vector<geo::Transform2>& particles,
+                     const std::vector<double>& ranges_real, const WorldModel2D& wm)
+{
+    std::vector<geo::Transform2> new_particles;
+
+    double total_prob = 0;
+
+    std::vector<double> particle_probs(particles.size(), 1);
+    for(unsigned int i = 0; i < particles.size(); ++i)
+    {
+        const geo::Transform2& p = particles[i];
+        std::vector<double> ranges_hyp = renderLRF(lrf, p, wm);
+
+        for(unsigned j = 0; j < ranges_hyp.size(); ++j)
+            particle_probs[i] *= prob(ranges_real[j], ranges_hyp[j]);
+
+        total_prob += particle_probs[i];
+    }
+
+    // normalize
+    for(unsigned int i = 0; i < particles.size(); ++i)
+    {
+        particle_probs[i] *= (1.0 / total_prob);
+        if (particle_probs[i] > 0.00001)
+            new_particles.push_back(particles[i]);
+    }
+
+    return new_particles;
+}
+
+// ----------------------------------------------------------------------------------------------------
+
 void drawParticleFilter(Canvas& canvas, const geo::LaserRangeFinder& lrf, const std::vector<geo::Transform2>& particles,
                         const geo::Transform2& real_pos, const WorldModel2D& wm, int i_particle = -1)
 {
@@ -330,6 +362,122 @@ void particleFilterSection(ImageWriter& iw)
 
         iw.process(canvas);
     }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    canvas = iw.nextCanvas();
+
+    for(int i = 0; i < particles.size(); ++i)
+        drawParticle(canvas, particles[i], particle_color);
+
+    particles = filterParticles(lrf, particles, ranges_real, wm);
+
+    for(int i = 0; i < particles.size(); ++i)
+        drawParticle(canvas, particles[i], particle_color_bold);
+
+    drawWorld(canvas, wm);
+
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    geo::Transform2 odom = fromXYADegrees(0, 0, 45);
+
+    for(int i = 0; i < 3; ++i)
+    {
+        if (i > 0)
+            real_pose = real_pose * odom;
+
+        canvas = iw.nextCanvas();
+        drawWorld(canvas, wm);
+
+        for(int j = 0; j < particles.size(); ++j)
+            drawParticle(canvas, particles[j], particle_color);
+
+        ranges_real = renderLRF(lrf, real_pose, wm);
+        drawRanges(canvas, lrf, real_pose, ranges_real, Color(0, 150, 0, 3), Color(150, 150, 150, 1));
+        drawParticle(canvas, real_pose, Color(0, 150, 0, 2));
+        iw.process(canvas);
+
+    }
+
+    test_canvas = canvas.createSubCanvas(0.1, 0.2, 0.35, 0.35);
+    test_canvas.center.y = 0.9 * test_canvas.height();
+    test_canvas.pixels_per_meter = canvas.pixels_per_meter / 1.5;
+
+    drawRanges(test_canvas, lrf, test_pose, ranges_real, Color(0, 150, 0, 3), Color(150, 150, 150, 1));
+    drawParticle(test_canvas, test_pose, Color(0, 150, 0, 2));
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    for(int i = 0; i < 3; ++i)
+    {
+        canvas = iw.nextCanvas();
+        drawWorld(canvas, wm);
+
+        test_canvas = canvas.createSubCanvas(0.1, 0.2, 0.35, 0.35);
+        test_canvas.center.y = 0.9 * test_canvas.height();
+        test_canvas.pixels_per_meter = canvas.pixels_per_meter / 1.5;
+
+        drawParticle(canvas, real_pose, Color(0, 150, 0, 2));
+
+        drawRanges(test_canvas, lrf, test_pose, ranges_real, Color(0, 150, 0, 3), Color(150, 150, 150, 1));
+        drawParticle(test_canvas, test_pose, Color(0, 150, 0, 2));
+
+        for(int j = 0; j < particles.size(); ++j)
+        {
+            if (i > 0)
+                particles[j] =  particles[j] * odom;
+
+            drawParticle(canvas, particles[j], particle_color);
+        }
+
+        iw.process(canvas);
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    for(int k = 0; k < particles.size() + 1; ++k)
+    {
+        int i = k;
+        if (k == particles.size())
+        {
+            i = 1;
+        }
+
+        canvas = iw.nextCanvas();
+        drawWorld(canvas, wm);
+
+        if (k < particles.size())
+        {
+            drawParticle(canvas, real_pose, Color(0, 150, 0, 2));
+            for(int j = 0; j < particles.size(); ++j)
+                drawParticle(canvas, particles[j], particle_color);
+        }
+
+        Canvas test_canvas = canvas.createSubCanvas(0.1, 0.2, 0.35, 0.35);
+        test_canvas.center.y = 0.9 * test_canvas.height();
+        test_canvas.pixels_per_meter = canvas.pixels_per_meter / 1.5;
+
+        drawRanges(test_canvas, lrf, test_pose, ranges_real, Color(0, 150, 0, 3), Color(150, 150, 150, 1));
+        drawParticle(test_canvas, test_pose, Color(0, 150, 0, 2));
+
+        const geo::Transform2& particle = particles[i];
+        drawParticle(canvas, particle, particle_color_bold);
+
+        std::vector<double> ranges_hyp = renderLRF(lrf, particle, wm);
+        drawRanges(canvas, lrf, particle, ranges_hyp, Color(255, 0, 0, 3), Color(150, 150, 150, 1));
+        drawParticle(canvas, particle, particle_color_bold);
+        drawRanges(test_canvas, lrf, test_pose, ranges_hyp, Color(255, 0, 0, 3), Color(150, 150, 150, 1));
+        drawParticle(test_canvas, test_pose, particle_color_bold);
+
+        iw.process(canvas);
+    }
+
+
+
+
 
 
 

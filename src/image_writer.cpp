@@ -23,9 +23,10 @@ void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 
 // ----------------------------------------------------------------------------------------------------
 
-ImageWriter::ImageWriter(int width, int height, const cv::Scalar& background_color) : canvas_(width, height, background_color),
-    do_show_(true), do_write_(false)
+ImageWriter::ImageWriter(int width, int height, const geo::Vec2& p1, const geo::Vec2& p2, const cv::Scalar& background_color)
+    : canvas_(width, height, background_color), do_show_(true), do_write_(false)
 {
+    canvas_.pixels_per_meter = width / (p2.x - p1.x);
 }
 
 // ----------------------------------------------------------------------------------------------------

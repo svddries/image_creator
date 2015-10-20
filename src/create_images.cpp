@@ -10,9 +10,9 @@
 
 int main(int argc, char **argv)
 {
-    ImageWriter iw(800, 600, cv::Scalar(255, 255, 255));
+    ImageWriter iw(1200, 900, geo::Vec2(-5, -3.75), geo::Vec2(5, 3.75), cv::Scalar(255, 255, 255));
 
-    bool show = true;
+    bool show = false;
 
     if (!show && argc > 1)
     {

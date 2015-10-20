@@ -8,7 +8,7 @@ class ImageWriter
 
 public:
 
-    ImageWriter(int width, int height, const cv::Scalar& background_color);
+    ImageWriter(int width, int height, const geo::Vec2& p1, const geo::Vec2& p2, const cv::Scalar& background_color);
 
     ~ImageWriter();
 

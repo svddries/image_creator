@@ -64,6 +64,7 @@ add_library(image_creator
   src/relative.cpp
   src/world_model.cpp
   src/bad_localization.cpp
+  src/lrf_example.cpp
 )
 target_link_libraries(image_creator ${catkin_LIBRARIES})
 

@@ -4,6 +4,7 @@
 #include "segmentation.h"
 #include "relative.h"
 #include "bad_localization.h"
+#include "lrf_example.h"
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -22,13 +23,15 @@ int main(int argc, char **argv)
 
     iw.setShow(show);
 
+    lrfExample(iw);
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     particleFilterSection(iw);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-//    segmentationSection(iw);
+    segmentationSection(iw);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -36,7 +39,7 @@ int main(int argc, char **argv)
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-//    relativeSection(iw);
+    relativeSection(iw);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

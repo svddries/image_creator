@@ -77,3 +77,17 @@ void drawRanges(Canvas& canvas, const geo::LaserRangeFinder& lrf, const geo::Tra
 }
 
 // ----------------------------------------------------------------------------------------------------
+
+void drawLRFPose(Canvas& canvas, const geo::Transform2& pose, const Color& color)
+{
+    Model2D model = createCircle(0.1);
+    Contour2D& c = model.addContour();
+
+    c.addPoint(0, 0);
+    c.addPoint(0.2, 0);
+
+    drawModel(canvas, model, pose, color);
+}
+
+// ----------------------------------------------------------------------------------------------------
+

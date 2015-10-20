@@ -21,4 +21,10 @@ void rangesToImagePoints(Canvas& canvas, geo::LaserRangeFinder& lrf, const geo::
 void drawRanges(Canvas& canvas, const geo::LaserRangeFinder& lrf, const geo::Transform2& lrf_pose, const std::vector<double>& ranges,
                 const Color& point_color, const Color& line_color = Color());
 
+// ----------------------------------------------------------------------------------------------------
+
+void drawLRFPose(Canvas& canvas, const geo::Transform2& pose, const Color& color);
+
+// ----------------------------------------------------------------------------------------------------
+
 #endif

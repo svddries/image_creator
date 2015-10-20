@@ -65,9 +65,13 @@ struct WorldModel2D
 
 // ----------------------------------------------------------------------------------------------------
 
+void createBoxContour(const geo::Vec2& p1, const geo::Vec2& p2, Contour2D& c, bool inside_out = false);
+
 Model2D createBox(double width, double height, bool inside_out = false);
 
 Model2D createBox(const geo::Vec2& p1, const geo::Vec2& p2, bool inside_out = false);
+
+void createCircleContour(double radius, Contour2D& c, int num_corners = 20);
 
 Model2D createCircle(double radius, int num_corners = 20);
 

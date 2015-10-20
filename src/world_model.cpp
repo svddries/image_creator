@@ -2,6 +2,8 @@
 
 #include "canvas.h"
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 // ----------------------------------------------------------------------------------------------------
 
 Model2D createBox(double width, double height, bool inside_out)
@@ -15,7 +17,14 @@ Model2D createBox(const geo::Vec2& p1, const geo::Vec2& p2, bool inside_out)
 {
     Model2D model;
     Contour2D& c = model.addContour();
+    createBoxContour(p1, p2, c, inside_out);
+    return model;
+}
 
+// ----------------------------------------------------------------------------------------------------
+
+void createBoxContour(const geo::Vec2& p1, const geo::Vec2& p2, Contour2D& c, bool inside_out)
+{
     double x_min = std::min(p1.x, p2.x);
     double x_max = std::max(p1.x, p2.x);
     double y_min = std::min(p1.y, p2.y);
@@ -35,8 +44,17 @@ Model2D createBox(const geo::Vec2& p1, const geo::Vec2& p2, bool inside_out)
         c.addPoint(x_max, y_max);
         c.addPoint(x_max, y_min);
     }
+}
 
-    return model;
+// ----------------------------------------------------------------------------------------------------
+
+void createCircleContour(double radius, Contour2D& c, int num_corners)
+{
+    for(int i = 0; i < num_corners; ++i)
+    {
+        double a = 6.283 * i / num_corners;
+        c.addPoint(sin(a) * radius, cos(a) * radius);
+    }
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -45,14 +63,7 @@ Model2D createCircle(double radius, int num_corners)
 {
     Model2D model;
     Contour2D& c = model.addContour();
-
-    // Calculate vertices
-    for(int i = 0; i < num_corners; ++i)
-    {
-        double a = 6.283 * i / num_corners;
-        c.addPoint(sin(a) * radius, cos(a) * radius);
-    }
-
+    createCircleContour(radius, c, num_corners);
     return model;
 }
 
@@ -84,7 +95,7 @@ void drawModel(Canvas& canvas, const Model2D& m, const geo::Transform2& m_pose, 
             cv::Point p1_img = canvas.worldToImage(m_pose * c.points[j]);
             cv::Point p2_img = canvas.worldToImage(m_pose * c.points[(j + 1) % c.points.size()]);
 
-            cv::line(canvas.image, p1_img, p2_img, color.color, color.thickness);
+            cv::line(canvas.image, p1_img, p2_img, color.color, color.thickness, CV_AA);
         }
     }
 }

@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    badLocalization(iw);
+//    badLocalization(iw);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

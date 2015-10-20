@@ -7,6 +7,6 @@
 
 #include <geolib/sensors/LaserRangeFinder.h>
 
-void particleFilterSection(ImageWriter& iw, const geo::LaserRangeFinder& lrf, const WorldModel2D& wm);
+void particleFilterSection(ImageWriter& iw);
 
 #endif

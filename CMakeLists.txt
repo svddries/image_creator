@@ -65,6 +65,7 @@ add_library(image_creator
   src/world_model.cpp
   src/bad_localization.cpp
 )
+target_link_libraries(image_creator ${catkin_LIBRARIES})
 
 add_executable(create-images src/create_images.cpp)
 target_link_libraries(create-images image_creator ${catkin_LIBRARIES})

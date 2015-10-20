@@ -24,21 +24,7 @@ int main(int argc, char **argv)
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    WorldModel2D wm;
-    wm.addEntity(createBox(geo::Vec2(-4, -2), geo::Vec2(4, 2), true), geo::Transform2::identity());
-    wm.addEntity(createBox(geo::Vec2(1.5, -1.5), geo::Vec2(2, -2)), geo::Transform2::identity());
-    wm.addEntity(createCircle(0.5), geo::Transform2(geo::Mat2::identity(), geo::Vec2(-1.5, -1.5)));
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    geo::LaserRangeFinder lrf;
-    lrf.setNumBeams(20);
-    lrf.setAngleLimits(-1.2, 1.2);
-    lrf.setRangeLimits(0, 10);
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-//    particleFilterSection(iw, lrf, wm);
+    particleFilterSection(iw);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -50,7 +36,7 @@ int main(int argc, char **argv)
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    relativeSection(iw);
+//    relativeSection(iw);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

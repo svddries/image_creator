@@ -18,6 +18,27 @@ Model2D createParticle()
 
 // ----------------------------------------------------------------------------------------------------
 
+void drawParticle(Canvas& canvas, const geo::Transform2& particle, const Color& color)
+{
+    Model2D particle_model = createParticle();
+    drawModel(canvas, particle_model, particle, color);
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+void drawParticles(Canvas& canvas, const std::vector<geo::Transform2>& particles, const Color& color)
+{
+    Model2D particle_model = createParticle();
+
+    for(unsigned int i = 0; i < particles.size(); ++i)
+    {
+        const geo::Transform2& p = particles[i];
+        drawModel(canvas, particle_model, p, color);
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------
+
 void drawParticleFilter(Canvas& canvas, const geo::LaserRangeFinder& lrf, const std::vector<geo::Transform2>& particles,
                         const geo::Transform2& real_pos, const WorldModel2D& wm, int i_particle = -1)
 {
@@ -77,34 +98,112 @@ void drawParticleFilter(Canvas& canvas, const geo::LaserRangeFinder& lrf, const 
 
 // ----------------------------------------------------------------------------------------------------
 
-void particleFilterSection(ImageWriter& iw, const geo::LaserRangeFinder& lrf, const WorldModel2D& wm)
+void particleFilterSection(ImageWriter& iw)
 {
     iw.setLabel("pf");
 
-    std::vector<geo::Transform2> particles;
-    for(double y = -1; y < 1.5; y += 0.5)
-        for(double x = -3; x < 3.5; x += 0.5)
-            for(double a = 0; a < 6; a += M_PI / 4)
-                particles.push_back(fromXYA(x, y, a));
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    geo::Transform2 real_pos;
-    real_pos.t = geo::Vec2(2.5, -0.5);
-    real_pos.setRotation(-M_PI / 4);
+    WorldModel2D wm;
 
-    for(int i = 199; i < particles.size(); ++i)
+    Model2D room;
     {
+        Contour2D& c = room.addContour();
+        c.addPoint(-2, -2);
+        c.addPoint( 2, -2);
 
-//        std::cout << i << std::endl;
+        c.addPoint( 2,  1);
+        c.addPoint( 1,  1);
+        c.addPoint( 1,  2);
 
-        Canvas canvas = iw.nextCanvas();
-
-        drawWorld(canvas, wm);
-        drawParticleFilter(canvas, lrf, particles, real_pos, wm, i);
-
-//        std::cout << particles[i] << std::endl;
-
-        iw.process(canvas);
+        c.addPoint(-2,  2);
     }
+
+    geo::Transform2 room_offset = fromXYADegrees(2, 0, 0);
+
+    wm.addEntity(room, room_offset);
+//    wm.addEntity(createBox(geo::Vec2(1.5, -1.5), geo::Vec2(2, -2)), geo::Transform2::identity());
+//    wm.addEntity(createCircle(0.5), geo::Transform2(geo::Mat2::identity(), geo::Vec2(-1.5, -1.5)));
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    geo::LaserRangeFinder lrf;
+    lrf.setNumBeams(20);
+    lrf.setAngleLimits(-1.2, 1.2);
+    lrf.setRangeLimits(0, 10);
+
+    geo::Transform2 real_pose = room_offset * fromXYADegrees(1, -1, -45);
+    geo::Transform2 test_pose = fromXYADegrees(-3, 1.425, -90);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    Canvas canvas = iw.nextCanvas();
+    drawWorld(canvas, wm);
+    iw.process(canvas);
+
+    drawParticle(canvas, real_pose, Color(0, 150, 0, 2));
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    std::vector<double> ranges_real = renderLRF(lrf, real_pose, wm);
+    drawRanges(canvas, lrf, real_pose, ranges_real, Color(0, 150, 0, 3), Color(150, 150, 150, 1));
+    drawParticle(canvas, real_pose, Color(0, 150, 0, 2));
+
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    drawRanges(canvas, lrf, test_pose, ranges_real, Color(0, 150, 0, 3), Color(150, 150, 150, 1));
+    drawParticle(canvas, test_pose, Color(0, 150, 0, 2));
+
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    std::vector<geo::Transform2> particles;
+    for(double y = -1.5; y < 2; y += 0.5)
+    {
+        for(double x = -1.5; x < 2; x += 0.5)
+        {
+            for(double a = 0; a < 6; a += M_PI / 4)
+            {
+                if (x < 1 || y < 1)
+                    particles.push_back(room_offset * fromXYA(x, y, a));
+            }
+        }
+    }
+
+    drawParticles(canvas, particles, Color(255, 100, 100, 1));
+    iw.process(canvas);
+
+
+
+
+
+
+
+
+
+
+//    geo::Transform2 real_pos;
+//    real_pos.t = geo::Vec2(2.5, -0.5);
+//    real_pos.setRotation(-M_PI / 4);
+
+//    for(int i = 199; i < particles.size(); ++i)
+//    {
+
+////        std::cout << i << std::endl;
+
+//        Canvas canvas = iw.nextCanvas();
+
+//        drawWorld(canvas, wm);
+//        drawParticleFilter(canvas, lrf, particles, real_pos, wm, i);
+
+////        std::cout << particles[i] << std::endl;
+
+//        iw.process(canvas);
+//    }
 }
 
 

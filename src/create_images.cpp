@@ -12,13 +12,18 @@ int main(int argc, char **argv)
 {
     ImageWriter iw(1200, 900, geo::Vec2(-5, -3.75), geo::Vec2(5, 3.75), cv::Scalar(255, 255, 255));
 
-    bool show = false;
+    bool show = true;
 
     if (!show && argc > 1)
     {
         iw.setWritePath(argv[1]);
         iw.setWrite(true);
 //        std::cout << "Going to write!" << std::endl;
+    }
+
+    if (argc > 2)
+    {
+        iw.setImagePath(argv[2]);
     }
 
     iw.setShow(show);

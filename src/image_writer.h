@@ -14,6 +14,10 @@ public:
 
     void setWritePath(const std::string& path) { path_ = path; }
 
+    void setImagePath(const std::string& path) { image_path_ = path; }
+
+    const std::string& image_path() const { return image_path_; }
+
     void setShow(bool b = true) { do_show_ = b; }
 
     void setWrite(bool b = true) { do_write_ = b; }
@@ -40,6 +44,8 @@ private:
     bool do_write_;
 
     std::string path_;
+
+    std::string image_path_;
 
 };
 

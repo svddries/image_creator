@@ -15,6 +15,10 @@ Model2D createBox(double width, double height, bool inside_out)
 
 Model2D createBox(const geo::Vec2& p1, const geo::Vec2& p2, bool inside_out)
 {
+//    geo::Vec2 hsize = p2 - p1;
+//    geo::Vec2 pos = (p1 + p2) / 2;
+//    std::cout << "wm.addEntity(createBox(" << hsize.x << ", " << hsize.y << "), fromXYADegrees(" << pos.x << ", " << pos.y << ", 0));" << std::endl;
+
     Model2D model;
     Contour2D& c = model.addContour();
     createBoxContour(p1, p2, c, inside_out);

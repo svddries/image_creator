@@ -236,11 +236,17 @@ void relativeSection(ImageWriter& iw)
     wm.addEntity(createBox(0.95833, 0.516667), fromXYADegrees(-1.72917, -0.616667, 0));
     wm.addEntity(createBox(0.96666, 0.50833), fromXYADegrees(-1.75, 1.37084, 0));
     wm.addEntity(createBox(1.6, 0.30834), fromXYADegrees(-0.45, -1.8375, 0));
+
+    int idx_table = wm.entities.size();
     wm.addEntity(createBox(0.65, 0.95), fromXYADegrees(1.6, 0.4, 0));
+
+    int idx_cabinet = wm.entities.size();
     wm.addEntity(createBox(0.55, 1.28333), fromXYADegrees(3.54167, 0.558333, 0));
 
     wm.addEntity(createCircle(0.1), fromXYA(0.358333, 1.81667, 0));
     wm.addEntity(createCircle(0.1), fromXYA(-1.73333, -1.78333, 0));
+
+    int idx_plant = wm.entities.size();
     wm.addEntity(createCircle(0.1), fromXYA(3.18333, 1.68333, 0));
 
     Model2D model;
@@ -268,7 +274,7 @@ void relativeSection(ImageWriter& iw)
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     int idx_lrf = wm.entities.size();
-    wm.addEntity(createLRFPose(), fromXYADegrees(2.49167, -0.766667, 160), Color(0, 150, 0, 2));
+    wm.addEntity(createLRFPose(), fromXYADegrees(0.533333, -1.24167, 145), Color(0, 150, 0, 2));
     drawWorld(canvas, wm);
     iw.process(canvas);
 
@@ -338,22 +344,33 @@ void relativeSection(ImageWriter& iw)
     drawWorldModelSceneGraph(canvas, wm2, links);
     iw.process(canvas);
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
     canvas = iw.nextCanvas();
+    drawImage(canvas, iw.image_path() + "/livingroom2.jpg", 0.9);
 
-//    std::vector<Link> links;
+    wm.entities[idx_target].pose.t.y += 0.7;
+    wm.entities[idx_couch].pose.t.y += 0.7;
+
     links.clear();
-    links.push_back(Link(0, 1));
-    links.push_back(Link(1, 2));
-    links.push_back(Link(0, 3));
-    links.push_back(Link(3, 4));
-    links.push_back(Link(1, 5));
+    links.push_back(Link(idx_couch, idx_target));
+    links.push_back(Link(idx_lrf, idx_couch));
+
+    drawWorldModelSceneGraph(canvas, wm, links);
+    iw.process(canvas);
+
+    links.push_back(Link(idx_couch, 2));
+    links.push_back(Link(2, 3));
+    links.push_back(Link(2, 4));
+    links.push_back(Link(idx_lrf, idx_table));
+    links.push_back(Link(idx_table, idx_cabinet));
+    links.push_back(Link(idx_cabinet, idx_plant));
+
     drawWorldModelSceneGraph(canvas, wm, links);
     iw.process(canvas);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Soccer field
+
+    iw.setLabel("relative-soccer");
 
 //Click: [ -2.0125 -0.0125 ]
 //Click: [ 0.8375 -1.1 ]
@@ -376,7 +393,7 @@ void relativeSection(ImageWriter& iw)
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    drawWorldModelAbsolute(canvas, wm, geo::Vec2(-4, 2));
+    drawWorldModelAbsolute(canvas, wm, geo::Vec2(-4, 2.67));
     iw.process(canvas);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

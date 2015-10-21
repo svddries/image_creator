@@ -1,6 +1,7 @@
 #include "image_writer.h"
 
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <iomanip>
 
 // ----------------------------------------------------------------------------------------------------
@@ -86,3 +87,22 @@ void ImageWriter::process(const Canvas& canvas)
     }
 }
 
+// ----------------------------------------------------------------------------------------------------
+
+void drawImage(Canvas& canvas, const std::string& filename, double width)
+{
+    cv::Mat image = cv::imread(filename);
+
+    int width_pixels = canvas.width() * width;
+    double f = (double)width_pixels / image.cols;
+    int height_pixels = f * image.rows;
+
+    cv::Mat image_resized;
+    cv::resize(image, image_resized, cv::Size(width_pixels, height_pixels));
+
+    cv::Mat roi = canvas.image(cv::Rect((canvas.image.cols - width_pixels) / 2,
+                                        (canvas.image.rows - height_pixels) / 2,
+                                        width_pixels, height_pixels));
+
+    image_resized.copyTo(roi);
+}

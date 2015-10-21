@@ -49,4 +49,6 @@ private:
 
 };
 
+void drawImage(Canvas& canvas, const std::string& filename, double width);
+
 #endif

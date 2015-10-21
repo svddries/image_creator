@@ -4,6 +4,7 @@
 #include "world_model.h"
 
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -136,6 +137,30 @@ void drawTriangle(Canvas& canvas, const geo::Vec2& p1, const geo::Vec2& p2, cons
     cv::line(canvas.image, p2_img, p3_img, color.color, color.thickness);
 }
 
+
+// ----------------------------------------------------------------------------------------------------
+
+Model2D createTarget()
+{
+    Model2D m;
+    createCircleContour(0.02, m.addContour());
+    createCircleContour(0.08, m.addContour());
+    createCircleContour(0.16, m.addContour());
+    createCircleContour(0.24, m.addContour());
+    return m;
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+Model2D createLRFPose()
+{
+    Model2D model = createCircle(0.1);
+    Contour2D& c = model.addContour();
+    c.addPoint(0, 0);
+    c.addPoint(0.2, 0);
+    return model;
+}
+
 // ----------------------------------------------------------------------------------------------------
 
 Model2D createSoccerFieldModel()
@@ -198,28 +223,127 @@ void relativeSection(ImageWriter& iw)
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     WorldModel2D wm;
-    wm.addEntity(createBox(geo::Vec2(0, -4), geo::Vec2(8, 0), true), fromXYA(-4, 2, 0)); // 0
-    wm.addEntity(createBox(1.6, 0.8), fromXYA(2, -1, 0));      // 1  table
-    wm.addEntity(createCircle(0.1), fromXYA(2.6, -0.8, 0));    // 2  small object
-    wm.addEntity(createCircle(0.5), fromXYA(-3.2, -1.2, 0));   // 3
-    wm.addEntity(createCircle(0.3), fromXYA(-2.2, -1.4, 0));   // 4
-    wm.addEntity(createCircle(0.3), fromXYA(3.3, 1.0, 0));     // 5
+
+//    wm.addEntity(createBox(geo::Vec2(), geo::Vec2()));
+
+//    wm.addEntity(createBox(7.63, 4.09, true), fromXYADegrees(0.085, 0.065, 0));
+    wm.addEntity(createBox(geo::Vec2(0, -4.09), geo::Vec2(7.63, 0), true), fromXYADegrees(-3.75, 2.1, 0));
+
+
+    int idx_couch = wm.entities.size();
+    wm.addEntity(createBox(0.691667, 1.45833), fromXYADegrees(-0.529166, 0.404165, 0));
+    wm.addEntity(createBox(0.45833, 0.6), fromXYADegrees(-1.69583, 0.375, 0));
+    wm.addEntity(createBox(0.95833, 0.516667), fromXYADegrees(-1.72917, -0.616667, 0));
+    wm.addEntity(createBox(0.96666, 0.50833), fromXYADegrees(-1.75, 1.37084, 0));
+    wm.addEntity(createBox(1.6, 0.30834), fromXYADegrees(-0.45, -1.8375, 0));
+    wm.addEntity(createBox(0.65, 0.95), fromXYADegrees(1.6, 0.4, 0));
+    wm.addEntity(createBox(0.55, 1.28333), fromXYADegrees(3.54167, 0.558333, 0));
+
+    wm.addEntity(createCircle(0.1), fromXYA(0.358333, 1.81667, 0));
+    wm.addEntity(createCircle(0.1), fromXYA(-1.73333, -1.78333, 0));
+    wm.addEntity(createCircle(0.1), fromXYA(3.18333, 1.68333, 0));
+
+    Model2D model;
+    Contour2D& c = model.addContour();
+    c.addPoint(-3.73333 + 3.3, -1 + 1.6);
+    c.addPoint(-3.15 + 3.3, -1 + 1.6);
+    c.addPoint(-3.15 + 3.3, -1.46 + 1.6);
+    c.addPoint(-2.36 + 3.3, -1.46 + 1.6);
+    c.addPoint(-2.36 + 3.3, -1.97 + 1.6);
+    c.addPoint(-3.73333 + 3.3, -1.97 + 1.6);
+
+    wm.addEntity(model, fromXYADegrees(-3.3, -1.6, 0));
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     Canvas canvas = iw.nextCanvas();
+    drawImage(canvas, iw.image_path() + "/livingroom.jpg", 0.9);
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     drawWorld(canvas, wm);
     iw.process(canvas);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    int idx_lrf = wm.entities.size();
+    wm.addEntity(createLRFPose(), fromXYADegrees(2.49167, -0.766667, 160), Color(0, 150, 0, 2));
+    drawWorld(canvas, wm);
+    iw.process(canvas);
+
+    int idx_target = wm.entities.size();
+    wm.addEntity(createTarget(), fromXYADegrees(-0.533333, -0.725, 0), Color(255, 0, 0, 2));
+    drawWorld(canvas, wm);
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    // Moved couch
+
     canvas = iw.nextCanvas();
+    drawImage(canvas, iw.image_path() + "/livingroom2.jpg", 0.9);
+    drawWorld(canvas, wm);
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+//    canvas = iw.nextCanvas();
     drawWorldModelAbsolute(canvas, wm, wm.entities[0].pose.t);
     iw.process(canvas);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     canvas = iw.nextCanvas();
+    drawImage(canvas, iw.image_path() + "/livingroom2.jpg", 0.9);
+    drawWorld(canvas, wm);
+    iw.process(canvas);
 
     std::vector<Link> links;
+    links.push_back(Link(0, idx_target));
+    links.push_back(Link(0, idx_lrf));
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    drawWorldModelSceneGraph(canvas, wm, links);
+    iw.process(canvas);
+
+    canvas = iw.nextCanvas();
+    drawImage(canvas, iw.image_path() + "/livingroom2.jpg", 0.9);
+    drawWorld(canvas, wm);
+    iw.process(canvas);
+
+    links.clear();
+
+    links.push_back(Link(idx_couch, idx_target));
+    drawWorldModelSceneGraph(canvas, wm, links);
+    iw.process(canvas);
+
+    links.push_back(Link(idx_lrf, idx_couch));
+    drawWorldModelSceneGraph(canvas, wm, links);
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    WorldModel2D wm2;
+    wm2.entities.push_back(wm.entities[idx_lrf]);
+    wm2.entities.push_back(wm.entities[idx_couch]);
+    wm2.entities.push_back(wm.entities[idx_target]);
+
+    links.clear();
+    links.push_back(Link(0, 1));
+    links.push_back(Link(1, 2));
+
+    canvas = iw.nextCanvas();
+    drawWorldModelSceneGraph(canvas, wm2, links);
+    iw.process(canvas);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    canvas = iw.nextCanvas();
+
+//    std::vector<Link> links;
+    links.clear();
     links.push_back(Link(0, 1));
     links.push_back(Link(1, 2));
     links.push_back(Link(0, 3));

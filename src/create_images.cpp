@@ -28,15 +28,17 @@ int main(int argc, char **argv)
 
     iw.setShow(show);
 
-    lrfExample(iw);
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+//    lrfExample(iw);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    particleFilterSection(iw);
+//    particleFilterSection(iw);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    segmentationSection(iw);
+//    segmentationSection(iw);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
